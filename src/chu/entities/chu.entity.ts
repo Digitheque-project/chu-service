@@ -3,20 +3,20 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 @Entity('chus')
 export class Chu {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ unique: true })
-  name: string;
+  name!: string;
 
   @Column()
-  address: string;
+  address!: string;
 
   @Column()
-  phone: string;
+  phone!: string;
 
   @Column()
-  email: string;
+  email!: string;
 
   @Column()
-  responsable: string;
+  responsable!: string;
 }

@@ -7,6 +7,7 @@ import { ChuModule } from './chu/chu.module';
 import { Chu } from './chu/entities/chu.entity';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { JwtStrategy } from './common/strategies/jwt.strategy';
+import { PriseEnChargeModule } from './prise-en-charge/prise-en-charge.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { JwtStrategy } from './common/strategies/jwt.strategy';
       }),
     }),
     ChuModule,
+    PriseEnChargeModule,
   ],
   providers: [
     JwtStrategy,
