@@ -19,4 +19,10 @@ export class Chu {
 
   @Column()
   responsable!: string;
+
+  // Nom de fichier du logo, stocke par le service upload (ex: "<uuid>.png").
+  // C'est cette valeur qui est embarquee dans le token via l'auth-service,
+  // et qui permet ensuite un GET <UPLOAD_PUBLIC_URL>/files/<logo>.
+  @Column({ nullable: true })
+  logo?: string;
 }
