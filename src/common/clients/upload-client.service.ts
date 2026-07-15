@@ -43,7 +43,7 @@ export class UploadClientService {
 
     try {
       const form = new FormData();
-      const blob = new Blob([file.buffer], {
+      const blob = new Blob([new Uint8Array(file.buffer)], {
         type: file.mimetype || 'application/octet-stream',
       });
       form.append('file', blob, file.originalname);
