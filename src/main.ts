@@ -33,7 +33,7 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
 
-  SwaggerModule.setup('chu-docs', app, document, {
+  SwaggerModule.setup('chu/api/docs', app, document, {
     swaggerOptions: { persistAuthorization: true },
   });
 
