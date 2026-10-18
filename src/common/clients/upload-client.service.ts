@@ -4,6 +4,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 
 export interface StoredFile {
   filename: string;
@@ -15,8 +16,9 @@ export interface StoredFile {
 
 /**
  * Client interne vers le service upload.
- * Toutes les requetes sont authentifiees via la cle partagee x-api-key
- * (appel de service a service, pas de token utilisateur ici).
+ * Appel de service a service (pas de token utilisateur ici) : JWT de service
+ * court signe avec le JWT_SECRET partage par tous les services, accepte par
+ * la passerelle (route /files requiresAuth) comme par le service upload.
  */
 @Injectable()
 export class UploadClientService {
@@ -24,15 +26,20 @@ export class UploadClientService {
 
   constructor(private readonly config: ConfigService) {}
 
-  // URL interne du service upload (reseau docker / localhost).
+  private readonly jwt = new JwtService();
+
+  // Origine du service upload, ou de la passerelle du CHU (sans valeur par
+  // defaut : elle vient uniquement de UPLOAD_SERVICE_URL).
   private get baseUrl(): string {
-    return (
-      this.config.get<string>('UPLOAD_SERVICE_URL') ?? 'http://localhost:3005'
-    );
+    return (this.config.get<string>('UPLOAD_SERVICE_URL') ?? '').replace(/\/+$/, '');
   }
 
-  private get apiKey(): string {
-    return this.config.get<string>('INTERNAL_API_KEY') ?? '';
+  private authHeaders(): Record<string, string> {
+    const token = this.jwt.sign(
+      { userId: 'service-chu', role: 'SERVICE' },
+      { secret: this.config.get<string>('JWT_SECRET'), expiresIn: '2m' },
+    );
+    return { Authorization: `Bearer ${token}` };
   }
 
   /** Envoie un fichier au service upload et renvoie le filename stocke. */
@@ -50,7 +57,7 @@ export class UploadClientService {
 
       const res = await fetch(`${this.baseUrl}/files`, {
         method: 'POST',
-        headers: { 'x-api-key': this.apiKey },
+        headers: this.authHeaders(),
         body: form,
         signal: AbortSignal.timeout(10000),
       });
@@ -76,7 +83,7 @@ export class UploadClientService {
     try {
       await fetch(`${this.baseUrl}/files/${encodeURIComponent(filename)}`, {
         method: 'DELETE',
-        headers: { 'x-api-key': this.apiKey },
+        headers: this.authHeaders(),
         signal: AbortSignal.timeout(10000),
       });
     } catch (err) {
