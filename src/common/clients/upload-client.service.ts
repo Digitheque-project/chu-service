@@ -28,10 +28,10 @@ export class UploadClientService {
 
   private readonly jwt = new JwtService();
 
-  // Origine du service upload, ou de la passerelle du CHU (sans valeur par
-  // defaut : elle vient uniquement de UPLOAD_SERVICE_URL).
+  // Passerelle unique du CHU (routes /files) : sert a la fois aux appels de ce
+  // service et a l'URL publique renvoyee au front. Sans valeur par defaut.
   private get baseUrl(): string {
-    return (this.config.get<string>('UPLOAD_SERVICE_URL') ?? '').replace(/\/+$/, '');
+    return (this.config.get<string>('GATEWAY_URL') ?? '').replace(/\/+$/, '');
   }
 
   private authHeaders(): Record<string, string> {
@@ -95,7 +95,6 @@ export class UploadClientService {
   /** Construit l'URL publique consommable par le front (GET protege par JWT). */
   buildPublicUrl(filename?: string | null): string | null {
     if (!filename) return null;
-    const base = this.config.get<string>('UPLOAD_PUBLIC_URL') ?? this.baseUrl;
-    return `${base}/files/${filename}`;
+    return `${this.baseUrl}/files/${filename}`;
   }
 }
