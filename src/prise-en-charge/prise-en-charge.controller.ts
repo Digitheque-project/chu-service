@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { PriseEnChargeService } from './prise-en-charge.service';
 import { CreatePriseEnChargeDto } from './dto/create-prise-en-charge.dto';
 import { UpdatePriseEnChargeDto } from './dto/update-prise-en-charge.dto';
@@ -18,8 +18,10 @@ export class PriseEnChargeController {
 
   @Get()
   @ApiOperation({ summary: 'Lister les prises en charge' })
-  findAll() {
-    return this.priseEnChargeService.findAll();
+  // chuId : chaque CHU (SIH) ne voit que ses propres entreprises partenaires.
+  @ApiQuery({ name: 'chuId', required: false, description: 'Filtrer sur un CHU' })
+  findAll(@Query('chuId') chuId?: string) {
+    return this.priseEnChargeService.findAll(chuId);
   }
 
   @Get('chu/:chuId/prise-en-charge/:priseEnChargeId')
