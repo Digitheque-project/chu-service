@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsOptional, IsBoolean, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsBoolean, IsUUID, IsInt, Min, Max, IsNumber } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreatePriseEnChargeDto {
@@ -31,6 +31,19 @@ export class CreatePriseEnChargeDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @ApiPropertyOptional({ example: 80, description: "Part payée par l'entreprise en % (100 par défaut)" })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  tauxCouverture?: number;
+
+  @ApiPropertyOptional({ example: 200000, description: 'Plafond mensuel par patient (Ar), vide = sans plafond' })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  plafondMensuel?: number | null;
 
   @ApiProperty({ example: 'uuid-chu', description: 'ID du CHU' })
   @IsUUID()
